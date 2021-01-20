@@ -3,63 +3,53 @@ from natsort import natsorted
 
 import lib.utils.base_utils as util
 import write_model_info as model_info
+import lib.utils.file_creation as file_manager
+
 
 
 def make_linemode_dataset(main_folder,saving_path,scale,train_percentage):
 
-    # structure of data:
-    raw_NDDS_directory = os.path.join(main_folder,'ndds_captured')
-    main_data_path = saving_path
-    main_model_path = os.path.join(saving_path, 'models')
+    # create folder structure
+    try:
+        os.makedirs(saving_path)
+    except FileExistsError:
+        print(saving_path + ' exist')
+    depth_path,mask_path,mask_path2,rgb_path,valid_poses_path,main_model_path,raw_NDDS_directory = file_manager.makefolders(main_folder,saving_path)
+    try:
+        os.makedirs(main_model_path)
+    except FileExistsError:
+        print(main_model_path + ' exist')
+
+    # yaml files path
+    ground_truth_path = saving_path + '/gt.yml'
+    camera_info_path = saving_path + '/info.yml'
+    object_segmentation_path = saving_path + '/objects_segmentation_info.yml'
     model_info_yaml_path = os.path.join(main_model_path, 'models_info.yml')
+
+    # test.txt & train.txt path
+    test_txt_path = saving_path + '/test.txt'
+    train_txt_path = saving_path + '/train.txt'
+
+    # what kind of files want to get extraceted
+    depth_ending = '.depth.cm.16.png'
+    mask_ending = '.cs.png'
+    rgb_ending = '.png'
+    all_endings = ['.cs.png', '.16.png', '.8.png', '.micon.png', '.depth.png', '.is.png']
+
 
     # read settings.json
     object_list_with_dic = util.read_object_setting_json(raw_NDDS_directory + '/_object_settings.json')
     cam_K, depth_scale, image_size = util.read_camera_intrinsic_json(raw_NDDS_directory + '/_camera_settings.json')
+
+    for objects in object_list_with_dic:
+         util.make_empty_folder(valid_poses_path, objects['obj_class'])
 
 
     model_info.export_all_ply_from_folder(main_folder + '/ply_files', main_model_path, model_info_yaml_path, object_list_with_dic )
     model_info_yaml_dic = util.read_yml_file(main_model_path,'models_info.yml')
 
 
-    depth_folder = 'depth'
-    mask_folder = 'mask_all'
-    mask_folder2 = 'merged_masks'
-    rgb_folder = 'rgb'
-    valid_poses = 'valid_poses'
 
-    # yaml files path
-    ground_truth_path = main_data_path + '/gt.yml'
-    camera_info_path = main_data_path + '/info.yml'
-    object_segmentation_path = main_data_path + '/objects_segmentation_info.yml'
-
-    # test.txt & train.txt path
-    test_txt_path = main_data_path + '/test.txt'
-    train_txt_path = main_data_path + '/train.txt'
-
-    #what kind of files want to get extraceted
-    depth_ending = '.depth.cm.16.png'
-    mask_ending = '.cs.png'
-    rgb_ending = '.png'
-    all_endings = ['.cs.png','.16.png','.8.png','.micon.png','.depth.png','.is.png']
-
-    # create folder structure
-    try:
-        os.makedirs(main_data_path)
-    except FileExistsError:
-        print(main_data_path + ' exist')
-    try:
-        os.makedirs(main_model_path)
-    except FileExistsError:
-        print(main_model_path + ' exist')
-    # create folders
-    depth_path = util.make_empty_folder(main_data_path,depth_folder)
-    mask_path = util.make_empty_folder(main_data_path,mask_folder)
-    mask_path2 = util.make_empty_folder(main_data_path, mask_folder2)
-    rgb_path = util.make_empty_folder(main_data_path,rgb_folder)
-    valid_poses_path = util.make_empty_folder(main_data_path, valid_poses)
-    for objects in object_list_with_dic:
-        paths = util.make_empty_folder(valid_poses_path, objects['obj_class'])
 
     mask_index = 0
     depth_index = 0

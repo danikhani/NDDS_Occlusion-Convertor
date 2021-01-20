@@ -79,8 +79,9 @@ def main(args = None):
         make_linemode_dataset(raw_ndds_data, export_dataset_path, model_number, scale,train_percentage)
 
 def main2():
-    make_linemode_dataset('datasets/test1', 'datasets/test1/generated', 0.01, 0.9)
+    make_linemode_dataset('datasets/test2', 'datasets/test2/generated', 1, 0.9)
     #model_info.export_model_info(yml_file, ply_path, model_number)
+    vis_bb('datasets/test2/generated', 21,None)
 
 
 if __name__ == '__main__':

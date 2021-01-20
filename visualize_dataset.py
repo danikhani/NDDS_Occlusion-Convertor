@@ -9,20 +9,21 @@ import lib.utils.visualisation_utils as v_util
 
 
 ####### read_yml_file ##########
-def generate_paths(dataset_main_path,model_number):
+def generate_paths(dataset_main_path):
     models_info_yml_path = os.path.join(dataset_main_path,'models/models_info.yml')
-    gt_yml_path = os.path.join(dataset_main_path, 'data/{}/gt.yml'.format(model_number))
-    info_yml_path = os.path.join(dataset_main_path, 'data/{}/info.yml'.format(model_number))
-    rgb_path = os.path.join(dataset_main_path, 'data/{}/rgb'.format(model_number))
-    img_export_path = os.path.join(dataset_main_path, 'data/{}/rgb'.format(model_number))
+    gt_yml_path = os.path.join(dataset_main_path, 'gt.yml')
+    info_yml_path = os.path.join(dataset_main_path, 'info.yml')
+    rgb_path = os.path.join(dataset_main_path, 'rgb')
+    init_info = os.path.join(dataset_main_path, 'objects_segmentation_info.yml')
 
-    return models_info_yml_path,gt_yml_path,info_yml_path,rgb_path
+    return models_info_yml_path,gt_yml_path,info_yml_path,rgb_path,init_info
 
 ####### read_yml_file ##########
 def read_yml_file(yml_path):
     with open(yml_path) as file:
         yml_file = yaml.load(file, Loader=yaml.FullLoader)
     return yml_file
+
 
 ###### load different files from dataset folder ##########
 def load_linemod_data(models_info_yml_path, gt_yml_path, info_yml_path, frame_number, model_number):
@@ -37,13 +38,13 @@ def load_linemod_data(models_info_yml_path, gt_yml_path, info_yml_path, frame_nu
     ########### load gt.yml ################
     gt = read_yml_file(gt_yml_path)
     # load rotation matrix
-    cam_R_m2c = gt[frame_number][0]['cam_R_m2c']
+    cam_R_m2c = gt[frame_number][model_number-1]['cam_R_m2c']
     # convert rotation to 3x3 matrix
     cam_R_m2c = np.reshape(np.array(cam_R_m2c), newshape=(3, 3))
     # load translation matrix
-    cam_t_m2c = np.array(gt[frame_number][0]['cam_t_m2c'])
+    cam_t_m2c = np.array(gt[frame_number][model_number-1]['cam_t_m2c'])
     # load 2d bounding box
-    obj_bb = gt[frame_number][0]['obj_bb']
+    obj_bb = gt[frame_number][model_number-1]['obj_bb']
 
     ########### load info.yml ################
     info = read_yml_file(info_yml_path)
@@ -53,17 +54,29 @@ def load_linemod_data(models_info_yml_path, gt_yml_path, info_yml_path, frame_nu
     cam_K = np.reshape(np.array(cam_K), newshape=(3, 3))
     print(cam_K)
 
-    return bb3d_points,cam_R_m2c, cam_t_m2c, obj_bb, cam_K
+    dict = {
+        'b3d_points':bb3d_points,
+        'cam_R_m2c':cam_R_m2c,
+        'cam_t_m2c':cam_t_m2c,
+        'obj_bb':obj_bb,
+        'cam_K':cam_K
+    }
+    return dict
 
 
 
-def vis_bb(dataset_main_path,frame_number,model_number,export_path):
+def vis_bb(dataset_main_path,frame_number,export_path):
     # get paths
-    models_info_yml_path, gt_yml_path, info_yml_path, rgb_path = generate_paths(dataset_main_path,model_number)
+    models_info_yml_path, gt_yml_path, info_yml_path, rgb_path, init_info_path = generate_paths(dataset_main_path)
 
-    # get the data
-    b3d_points, cam_R_m2c, cam_t_m2c, obj_bb, cam_K = load_linemod_data(models_info_yml_path, gt_yml_path,
-                                                                        info_yml_path, frame_number, model_number)
+    init_info = read_yml_file(init_info_path)
+
+    object_list = []
+    for object in init_info:
+        model_number = object['obj_id']
+        dict = load_linemod_data(models_info_yml_path, gt_yml_path,info_yml_path, frame_number, model_number)
+        object_list.append(dict)
+
 
     # load rgb image as base.
     rgb_image_path = os.path.join(rgb_path, '{}.png'.format(frame_number))
@@ -71,17 +84,19 @@ def vis_bb(dataset_main_path,frame_number,model_number,export_path):
 
     ###### draw 2d bounding box ######
     rgb_2d_bbox = np.array(loaded_rgb.copy())
-    cv2.rectangle(rgb_2d_bbox, (obj_bb[0], obj_bb[1]), (obj_bb[0]+obj_bb[2], obj_bb[1]+obj_bb[3]), (255, 0, 0), 2)
+    for data in object_list:
+        cv2.rectangle(rgb_2d_bbox, (data['obj_bb'][0], data['obj_bb'][1]), (data['obj_bb'][0]+data['obj_bb'][2], data['obj_bb'][1]+data['obj_bb'][3]), (255, 0, 0), 2)
 
     ###### draw 3d bounding box ######
     rgb_3d_bbox = np.array(loaded_rgb.copy())
-    projected_points = v_util.project_bbox_3D_to_2D(b3d_points, cam_R_m2c, cam_t_m2c, cam_K,
-                                                    append_centerpoint=False)
-    v_util.draw_bbox_8_2D(rgb_3d_bbox, projected_points)
+    for data in object_list:
+        projected_points = v_util.project_bbox_3D_to_2D(data['b3d_points'], data['cam_R_m2c'], data['cam_t_m2c'], data['cam_K'],
+                                                        append_centerpoint=False)
+        v_util.draw_bbox_8_2D(rgb_3d_bbox, projected_points)
+
 
     # show images
-    print('want to show image but dont know')
-    cv2.imshow('2D bounding box',rgb_2d_bbox)
+    cv2.imshow('2D bounding box', rgb_2d_bbox)
     cv2.imshow('3D bounding box', rgb_3d_bbox)
     # press any key to close
     print("Press any key to close the images. DO NOT clsoe the images by clicking on X")
