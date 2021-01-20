@@ -1,0 +1,32 @@
+{
+	"exported_object_classes": [
+		"ass",
+		"plate"
+	],
+	"exported_objects": [
+		{
+			"class": "ass",
+			"segmentation_class_id": 85,
+			"segmentation_instance_id": 0,
+			"fixed_model_transform": [
+				[ 0, 0, 0.0099999997764825821, 0 ],
+				[ -0.0099999997764825821, 0, 0, 0 ],
+				[ 0, -0.0099999997764825821, 0, 0 ],
+				[ 70.135101318359375, 54.928398132324219, -108.69300079345703, 1 ]
+			],
+			"cuboid_dimensions": [ 135, 76.9927978515625, 100 ]
+		},
+		{
+			"class": "plate",
+			"segmentation_class_id": 170,
+			"segmentation_instance_id": 0,
+			"fixed_model_transform": [
+				[ 0, 0, 0.0099999997764825821, 0 ],
+				[ -0.0099999997764825821, 0, 0, 0 ],
+				[ 0, -0.0099999997764825821, 0, 0 ],
+				[ 79.176101684570312, 18.294500350952148, 98.022499084472656, 1 ]
+			],
+			"cuboid_dimensions": [ 135, 18, 100 ]
+		}
+	]
+}
