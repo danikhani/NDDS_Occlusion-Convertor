@@ -78,6 +78,8 @@ def main(args = None):
         train_percentage = args['train_percentage']
         make_linemode_dataset(raw_ndds_data, export_dataset_path, model_number, scale,train_percentage)
 
+def main2():
+    make_linemode_dataset('datasets/test1/ndds_captured', 'datasets/test1/generated', 0.01, 0.9)
 
 if __name__ == '__main__':
-    main()
+    main2()

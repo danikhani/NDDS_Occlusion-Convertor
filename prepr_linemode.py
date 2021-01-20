@@ -4,25 +4,30 @@ import numpy as np
 
 import lib.utils.base_utils as util
 
-def make_linemode_dataset(raw_NDDS_directory,saving_path,object_id,length_scale,train_percentage):
-    raw_data_directory = raw_NDDS_directory
+def make_linemode_dataset(raw_NDDS_directory,saving_path,scale,train_percentage):
+    # read settings.json
+    object_list_with_dic = util.read_object_setting_json(raw_NDDS_directory+'/_object_settings.json')
+    cam_K, depth_scale, image_size = util.read_camera_intrinsic_json(raw_NDDS_directory+'/_camera_settings.json')
 
-    # default settings:
-    cam_K = [572.4114, 0.0, 325.2611, 0.0, 573.57043, 242.04899, 0.0, 0.0, 1.0]
-    depth_scale = 1.0
-    image_size = [640, 480]
+    print('camera.settings.json found and instritics updated:')
+    print(cam_K)
+    print(depth_scale)
+    print(image_size)
+    print('object_settings.json found and objects extracted:')
+    print(object_list_with_dic)
 
-    #structure of data:
-    main_data_path = os.path.join(saving_path, 'data/{}'.format(object_id))
+    # structure of data:
+    main_data_path = os.path.join(saving_path, 'data/{}'.format(1))
     main_model_path = os.path.join(saving_path, 'models')
 
     depth_folder = 'depth'
-    mask_folder = 'mask'
+    mask_folder = 'mask_all'
+    mask_folder2 = 'merged_masks'
     rgb_folder = 'rgb'
 
     # yaml files path
-    ground_truth_path = main_data_path+'/gt.yml'
-    camera_info_path = main_data_path+'/info.yml'
+    ground_truth_path = main_data_path + '/gt.yml'
+    camera_info_path = main_data_path + '/info.yml'
 
     # test.txt & train.txt path
     test_txt_path = main_data_path + '/test.txt'
@@ -46,31 +51,27 @@ def make_linemode_dataset(raw_NDDS_directory,saving_path,object_id,length_scale,
     # create folders
     depth_path = util.make_empty_folder(main_data_path,depth_folder)
     mask_path = util.make_empty_folder(main_data_path,mask_folder)
+    mask_path2 = util.make_empty_folder(main_data_path, mask_folder2)
     rgb_path = util.make_empty_folder(main_data_path,rgb_folder)
 
     mask_index = 0
     depth_index = 0
     rgb_index = 0
-    sorted_list_of_files = natsorted(os.listdir(raw_data_directory))
+    sorted_list_of_files = natsorted(os.listdir(raw_NDDS_directory))
     for data_name in sorted_list_of_files:
         # find mask data
         if data_name.endswith(mask_ending):
-            util.copy_and_rename(raw_data_directory, data_name, mask_index, mask_path)
+            util.copy_and_rename(raw_NDDS_directory, data_name, mask_index, mask_path)
+            util.copy_and_rename(raw_NDDS_directory, data_name, mask_index, mask_path2)
             mask_index += 1
         # find depth data
         if data_name.endswith(depth_ending):
-            util.copy_and_rename(raw_data_directory, data_name, depth_index, depth_path)
+            util.copy_and_rename(raw_NDDS_directory, data_name, depth_index, depth_path)
             depth_index += 1
         # find rgb data
         if data_name.endswith(rgb_ending) and not any(data_name.endswith(x) for x in all_endings):
-            util.copy_and_rename(raw_data_directory, data_name, rgb_index, rgb_path)
+            util.copy_and_rename(raw_NDDS_directory, data_name, rgb_index, rgb_path)
             rgb_index += 1
-        if data_name.endswith('camera_settings.json'):
-            cam_K, depth_scale, image_size = util.get_camera_intrinsic(raw_data_directory,data_name)
-            print('camera.settings.json found and instritics updated:')
-            print(cam_K)
-            print(depth_scale)
-            print(image_size)
 
 
     #removing and recreating the yml files:
@@ -89,10 +90,26 @@ def make_linemode_dataset(raw_NDDS_directory,saving_path,object_id,length_scale,
     for data_name in sorted_list_of_files:
         # writing gt.yml
         if data_name.endswith('.json') and not data_name.endswith('settings.json'):
+            # read the json and return dict
+            objects_from_annotation = util.read_gt_json(raw_NDDS_directory, data_name)
             #get the arrays from the json files.
-            cam_R_m2c_array, cam_t_m2c_array, obj_bb = util.get_groundtruth_data(raw_data_directory, data_name,length_scale)
-            #save arrays in gt.yml
-            util.parse_groundtruth_yml(ground_truth_path, yml_index, cam_R_m2c_array, cam_t_m2c_array, obj_bb, object_id)
+            #cam_R_m2c_array, cam_t_m2c_array, obj_bb = util.get_groundtruth_data(objects_from_annotation,scale, object_id)
+            obj_index = 0
+            gt_info_list = []
+            for current_object in objects_from_annotation:
+                # check if the indexes match
+                if current_object['class'] == object_list_with_dic[obj_index]['obj_class']:
+                    # get gt information of current object
+                    gt_info_dict = util.get_groundtruth_data(current_object, scale, obj_index)
+                    gt_info_list.append(gt_info_dict)
+                    obj_index +=1
+                else:
+                    raise Exception("the index of gt.json and object_settings.json does not match!")
+
+            util.parse_groundtruth_yml(ground_truth_path,yml_index,gt_info_list)
+
+                    #save arrays in gt.yml
+            #util.parse_groundtruth_yml(ground_truth_path, yml_index, cam_R_m2c_array, cam_t_m2c_array, obj_bb, object_id)
             # save info.yml
             util.parse_camera_intrinsic_yml(camera_info_path, yml_index, cam_K, depth_scale)
             yml_index +=1
