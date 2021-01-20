@@ -76,7 +76,7 @@ def read_object_setting_json(file_path):
     object_list_with_dic = []
     object_classes = annotation['exported_objects']
     # iterate over all classes in this file and add them to dictionary
-    object_id = 0
+    object_id = 1
     for object in object_classes:
         obj_dict = {
             "obj_id": object_id,
@@ -95,6 +95,13 @@ def read_gt_json(raw_data_directory,json_file):
 
     objects_from_annotation = annotation['objects']
     return objects_from_annotation
+
+def read_yml_file(folder,yml_file_name):
+    source_file = os.path.join(folder, yml_file_name)
+    with open(source_file, 'r') as file:
+        annotation = yaml.load(file)
+
+    return annotation
 
 
 def get_groundtruth_data(objects_from_annotation,scale,object_id):
@@ -136,8 +143,13 @@ def get_groundtruth_data(objects_from_annotation,scale,object_id):
         "obj_bb" : obj_bb,
         "obj_id": object_id,
     }
+    info_for_txt = {
+        'rotation' : cam_R_m2c_array,
+        'obj_id': object_id,
+        'center' : cam_t_m2c_array
+    }
 
-    return gt_info_dict
+    return gt_info_dict, info_for_txt
 
 
 # generate test and train data numbers:
@@ -153,3 +165,42 @@ def make_training_set(start,end,training_percent):
             training_frames.remove(i)
 
     return training_frames,test_frames
+
+# write the valid_poses.txt files
+def parse_validpose_text(text_address, current_frame, image_size, info_for_txt, ply_info):
+    file = open(text_address, "w")
+
+    file.writelines('image size\n')
+    file.writelines('{} {}\n'.format(image_size[0],image_size[1]))
+
+    file.writelines('{}\n'.format(info_for_txt['obj_id']))
+
+    file.writelines('rotation:\n')
+    file.writelines('{} {} {}\n'.format(-info_for_txt['rotation'][1],info_for_txt['rotation'][2],-info_for_txt['rotation'][0]))
+    file.writelines(
+        '{} {} {}\n'.format(info_for_txt['rotation'][4], -info_for_txt['rotation'][5], info_for_txt['rotation'][3]))
+    file.writelines(
+        '{} {} {}\n'.format(info_for_txt['rotation'][7], -info_for_txt['rotation'][8], info_for_txt['rotation'][6]))
+
+    file.writelines('center:\n')
+    file.writelines(
+        '{} {} {}\n'.format(info_for_txt['center'][0]/1000, -info_for_txt['center'][1]/1000, -info_for_txt['center'][2]/1000))
+
+    file.writelines('extend:\n')
+    size_y = ply_info['size_y'] / 1000
+    size_z = ply_info['size_z'] / 1000
+    size_x = ply_info['size_x'] / 1000
+    file.writelines('{} {} {}\n'.format(size_y, size_z, size_x))
+
+    file.writelines('\n')
+    file.writelines('\n')
+    file.writelines('{}\n'.format(current_frame))
+
+    file.close()
+
+def prase_dictionary_yml(file_path, info_dict):
+
+    with io.open(file_path, 'w', encoding='utf8') as outfile:
+        yaml.dump(info_dict, outfile, default_flow_style=None,width=1000)
+
+    return True

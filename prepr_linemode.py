@@ -1,33 +1,37 @@
 import os
 from natsort import natsorted
-import numpy as np
 
 import lib.utils.base_utils as util
+import write_model_info as model_info
 
-def make_linemode_dataset(raw_NDDS_directory,saving_path,scale,train_percentage):
-    # read settings.json
-    object_list_with_dic = util.read_object_setting_json(raw_NDDS_directory+'/_object_settings.json')
-    cam_K, depth_scale, image_size = util.read_camera_intrinsic_json(raw_NDDS_directory+'/_camera_settings.json')
 
-    print('camera.settings.json found and instritics updated:')
-    print(cam_K)
-    print(depth_scale)
-    print(image_size)
-    print('object_settings.json found and objects extracted:')
-    print(object_list_with_dic)
+def make_linemode_dataset(main_folder,saving_path,scale,train_percentage):
 
     # structure of data:
-    main_data_path = os.path.join(saving_path, 'data/{}'.format(1))
+    raw_NDDS_directory = os.path.join(main_folder,'ndds_captured')
+    main_data_path = saving_path
     main_model_path = os.path.join(saving_path, 'models')
+    model_info_yaml_path = os.path.join(main_model_path, 'models_info.yml')
+
+    # read settings.json
+    object_list_with_dic = util.read_object_setting_json(raw_NDDS_directory + '/_object_settings.json')
+    cam_K, depth_scale, image_size = util.read_camera_intrinsic_json(raw_NDDS_directory + '/_camera_settings.json')
+
+
+    model_info.export_all_ply_from_folder(main_folder + '/ply_files', main_model_path, model_info_yaml_path, object_list_with_dic )
+    model_info_yaml_dic = util.read_yml_file(main_model_path,'models_info.yml')
+
 
     depth_folder = 'depth'
     mask_folder = 'mask_all'
     mask_folder2 = 'merged_masks'
     rgb_folder = 'rgb'
+    valid_poses = 'valid_poses'
 
     # yaml files path
     ground_truth_path = main_data_path + '/gt.yml'
     camera_info_path = main_data_path + '/info.yml'
+    object_segmentation_path = main_data_path + '/objects_segmentation_info.yml'
 
     # test.txt & train.txt path
     test_txt_path = main_data_path + '/test.txt'
@@ -53,6 +57,9 @@ def make_linemode_dataset(raw_NDDS_directory,saving_path,scale,train_percentage)
     mask_path = util.make_empty_folder(main_data_path,mask_folder)
     mask_path2 = util.make_empty_folder(main_data_path, mask_folder2)
     rgb_path = util.make_empty_folder(main_data_path,rgb_folder)
+    valid_poses_path = util.make_empty_folder(main_data_path, valid_poses)
+    for objects in object_list_with_dic:
+        paths = util.make_empty_folder(valid_poses_path, objects['obj_class'])
 
     mask_index = 0
     depth_index = 0
@@ -93,23 +100,21 @@ def make_linemode_dataset(raw_NDDS_directory,saving_path,scale,train_percentage)
             # read the json and return dict
             objects_from_annotation = util.read_gt_json(raw_NDDS_directory, data_name)
             #get the arrays from the json files.
-            #cam_R_m2c_array, cam_t_m2c_array, obj_bb = util.get_groundtruth_data(objects_from_annotation,scale, object_id)
-            obj_index = 0
+            obj_index = 1
             gt_info_list = []
             for current_object in objects_from_annotation:
                 # check if the indexes match
-                if current_object['class'] == object_list_with_dic[obj_index]['obj_class']:
+                if current_object['class'] == object_list_with_dic[obj_index-1]['obj_class']:
                     # get gt information of current object
-                    gt_info_dict = util.get_groundtruth_data(current_object, scale, obj_index)
+                    gt_info_dict,info_for_txt = util.get_groundtruth_data(current_object, scale, obj_index)
                     gt_info_list.append(gt_info_dict)
+
+                    util.parse_validpose_text(valid_poses_path+'/'+current_object['class']+ '/{}.txt'.format(yml_index), yml_index, image_size, info_for_txt,model_info_yaml_dic[obj_index])
                     obj_index +=1
                 else:
                     raise Exception("the index of gt.json and object_settings.json does not match!")
-
             util.parse_groundtruth_yml(ground_truth_path,yml_index,gt_info_list)
 
-                    #save arrays in gt.yml
-            #util.parse_groundtruth_yml(ground_truth_path, yml_index, cam_R_m2c_array, cam_t_m2c_array, obj_bb, object_id)
             # save info.yml
             util.parse_camera_intrinsic_yml(camera_info_path, yml_index, cam_K, depth_scale)
             yml_index +=1
@@ -124,6 +129,7 @@ def make_linemode_dataset(raw_NDDS_directory,saving_path,scale,train_percentage)
         for item in test_frames:
             f.write("%s\n" % item)
 
+    util.prase_dictionary_yml(object_segmentation_path,object_list_with_dic)
     print('data generated!')
     print('yml_index,mask_index,depth_index,rgb_index are:')
     print(yml_index,mask_index,depth_index,rgb_index)

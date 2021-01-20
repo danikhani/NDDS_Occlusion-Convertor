@@ -2,6 +2,7 @@ import numpy as np
 import io
 import yaml
 from plyfile import PlyData
+import os
 
 
 def load_model_ply(path_to_ply_file):
@@ -77,5 +78,6 @@ def export_model_para_yml(file_path, model_number, model_corners, model_distance
         }
     }
 
-    with io.open(file_path, 'w', encoding='utf8') as outfile:
+    # save the new one
+    with io.open(file_path, 'a', encoding='utf8') as outfile:
         yaml.dump(model_paras, outfile, default_flow_style=None,width=1000)
