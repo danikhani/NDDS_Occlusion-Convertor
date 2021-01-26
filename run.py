@@ -25,4 +25,18 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    #main()
+    from scipy.spatial.transform import Rotation as rotate
+    import numpy as np
+
+    r = rotate.from_matrix([[-1, 0, 0], [0, -1, 0], [0, 0, -1]])
+    print(r.as_euler('zyx'))
+
+    r = rotate.from_matrix([[1, 0, 0], [0, 1, 0], [0, 0, -1]])
+    print(r.as_euler('zyx'))
+
+    #rotation = np.dot(rotation, np.array([]))
+    #rotation = np.dot(rotation.T, np.array([[1, 0, 0], [0, 1, 0], [0, 0, -1]]))
+
+    r1 = rotate.from_euler('z', 90, degrees=True)
+    #rotation = np.dot(rotation, r1.as_dcm())
