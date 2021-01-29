@@ -4,20 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7c37284d-46f1-4cbb-9087-7371580b3196" name="Default Changelist" comment="scale corected">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="7c37284d-46f1-4cbb-9087-7371580b3196" name="Default Changelist" comment="change the test folder">
       <change beforePath="$PROJECT_DIR$/datasets/test/ndds_captured/000000.cs.png" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/test/ndds_captured/000000.cs.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/datasets/test/ndds_captured/000000.depth.cm.16.png" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/test/ndds_captured/000000.depth.cm.16.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/datasets/test/ndds_captured/000000.json" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/test/ndds_captured/000000.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/datasets/test/ndds_captured/000000.png" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/test/ndds_captured/000000.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/datasets/test/ndds_captured/000001.cs.png" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/test/ndds_captured/000001.cs.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/datasets/test/ndds_captured/000001.depth.cm.16.png" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/test/ndds_captured/000001.depth.cm.16.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/datasets/test/ndds_captured/000001.json" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/test/ndds_captured/000001.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/datasets/test/ndds_captured/000001.png" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/test/ndds_captured/000001.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/datasets/test/ndds_captured/_object_settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/test/ndds_captured/_object_settings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/datasets/test/ply_files/ass.ply" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/test/ply_files/ass.ply" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/datasets/test/ply_files/plate.ply" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/test/ply_files/plate.ply" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prepr_linemode.py" beforeDir="false" afterPath="$PROJECT_DIR$/prepr_linemode.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/datasets/test/ndds_captured/000001.cs.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/datasets/test/ndds_captured/000001.depth.cm.16.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/datasets/test/ndds_captured/000001.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/datasets/test/ndds_captured/000001.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/datasets/test/ndds_captured/_camera_settings.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/datasets/test/ndds_captured/_object_settings.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/datasets/test/ply_files/ass.ply" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/datasets/test/ply_files/plate.ply" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/run.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -112,7 +111,7 @@
       <workItem from="1611909848057" duration="83000" />
       <workItem from="1611910520107" duration="285000" />
       <workItem from="1611921183347" duration="920000" />
-      <workItem from="1611922472740" duration="1954000" />
+      <workItem from="1611922472740" duration="2356000" />
     </task>
     <task id="LOCAL-00001" summary="gitignore added and transformation matrices updated">
       <created>1611134803998</created>
@@ -163,7 +162,14 @@
       <option name="project" value="LOCAL" />
       <updated>1611675431556</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="added an instruction to a custom exception">
+      <created>1611924447045</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1611924447045</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -189,7 +195,8 @@
     <MESSAGE value="it works well" />
     <MESSAGE value="added rotation matrices to test" />
     <MESSAGE value="scale corected" />
-    <option name="LAST_COMMIT_MESSAGE" value="scale corected" />
+    <MESSAGE value="added an instruction to a custom exception" />
+    <option name="LAST_COMMIT_MESSAGE" value="added an instruction to a custom exception" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
