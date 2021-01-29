@@ -7,13 +7,13 @@ def main():
     ########### small config
     # since the files are from cad and each one of them has a different length unit.
     # Use one of these values to scale the box: (0.01,0.1,1,10,100). The smaller value makes a bigger box
-    scale = 0.1
+    scale = 1
     training_data_percentage = 0.9
     # folder of saved data
-    dataset_folder = 'datasets/test'
+    dataset_folder = 'datasets/test2'
 
     only_visulize = False
-    visulize_frame = 0
+    visulize_frame = 1
 
 
 

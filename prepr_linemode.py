@@ -98,11 +98,11 @@ def make_linemode_dataset(main_folder,saving_path,scale,train_percentage):
                     # get gt information of current object
                     gt_info_dict,info_for_txt = util.get_groundtruth_data(current_object, scale, obj_index)
                     gt_info_list.append(gt_info_dict)
-
                     util.parse_validpose_text(valid_poses_path+'/'+current_object['class']+ '/{}.txt'.format(yml_index), yml_index, image_size, info_for_txt,model_info_yaml_dic[obj_index])
                     obj_index +=1
                 else:
-                    raise Exception("the index of gt.json and object_settings.json does not match!")
+                    raise Exception("At the frame {} the index of gt.json and object_settings.json does not match. "
+                                    "An Object is missing in the frame. Remove the frame from ndds_capture and restart".format(yml_index))
             util.parse_groundtruth_yml(ground_truth_path,yml_index,gt_info_list)
 
             # save info.yml
