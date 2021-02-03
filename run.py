@@ -1,5 +1,5 @@
 
-from prepr_linemode import make_linemode_dataset
+from prepr_linemode import make_linemod_dataset
 from visualize_dataset import vis_bb
 
 
@@ -20,7 +20,7 @@ def main():
     ###########################################################
     generated_folder = dataset_folder + '/generated'
     if only_visulize is not True:
-        make_linemode_dataset(dataset_folder, generated_folder, scale, training_data_percentage)
+        make_linemod_dataset(dataset_folder, generated_folder, scale, training_data_percentage)
     vis_bb(generated_folder, visulize_frame,None)
 
 

@@ -7,7 +7,7 @@ import json
 import yaml
 import random
 
-
+# deletes an exisiting folder and remake it. If the folder doenst exist then it just creates a folder
 def make_empty_folder(main_path,folder):
     folder_path = os.path.join(main_path, folder)
     try:
@@ -115,6 +115,7 @@ def get_groundtruth_data(objects_from_annotation,scale,object_id):
     rotation = np.dot(rotation.T, np.array([[1, 0, 0], [0, 1, 0], [0, 0, -1]]))
     r1 = rotate.from_euler('z', 90, degrees=True)
     rotation = np.dot(rotation, r1.as_dcm())
+    #rotation = np.dot(rotation.T, r1.as_dcm())
 
     rotation_list = list(rotation[0, :]) + list(rotation[1, :]) + list(rotation[2, :])
 
