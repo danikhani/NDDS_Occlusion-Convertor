@@ -29,11 +29,26 @@ if __name__ == '__main__':
     from scipy.spatial.transform import Rotation as rotate
     import numpy as np
 
-    r = rotate.from_matrix([[-1, 0, 0], [0, -1, 0], [0, 0, -1]])
-    print(r.as_euler('zyx'))
+    rotation = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+    rotation2 = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+    print(rotation)
+    rotation = np.dot(rotation, np.array([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]))
+    print(rotation)
+    rotation = np.dot(rotation.T, np.array([[1, 0, 0], [0, 1, 0], [0, 0, -1]]))
+    print(rotation)
 
-    r = rotate.from_matrix([[1, 0, 0], [0, 1, 0], [0, 0, -1]])
-    print(r.as_euler('zyx'))
+    r1 = rotate.from_euler('x', 180, degrees=True)
+    rotation2 = np.dot(rotation2, r1.as_dcm())
+
+    rotation2 = np.dot(rotation2, r1.as_dcm())
+
+    r = rotate.from_matrix([[-1, 0, 0], [0, -1, 0], [0, 0, -1]])
+    print(r.as_euler('xyz'))
+
+    r2 = rotate.from_matrix([[1, 0, 0], [0, 1, 0], [0, 0, -1]])
+    print(r2.as_matrix())
+    print(r2.as_euler('xyz'))
+
 
     #rotation = np.dot(rotation, np.array([]))
     #rotation = np.dot(rotation.T, np.array([[1, 0, 0], [0, 1, 0], [0, 0, -1]]))
